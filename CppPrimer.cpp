@@ -290,10 +290,51 @@ int main()
     std::cout << oss.str();
     return 0;
 }
+// P352 可变lambda
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    size_t v1 = 42;  // v1是局部变量
+    // 如果想要改变被捕获变量 v1 的"值",需要加 mutable
+    auto f1 = [v1]()mutable { return ++v1; };
+    v1 = 0;
+    std::cout << f1();  // 43 ,v1的值被从42改成了43
+    return 0;
+}
+int main()
+{
+    size_t v1 = 42;
+    auto f1 = [&v1]()mutable { return ++v1; };
+    v1 = 0;
+    std::cout << f1();  // 1 ,v1的值
+    return 0;
+}
+// 指定lambda返回类型（现在即使不用尾置返回类型，也能正常编译通过）
+int main()
+{
+    std::vector<int> vec {-1, 0, 2, -3};
+    transform(vec.begin(), vec.end(), vec.begin(), [](int i)
+    {
+        if (i < 0) return -i; else return i;
+    });
+    // transform(vec.begin(), vec.end(), vec.begin(), [](int i) { return i < 0 ? -i : i; };
+    for (auto item : vec)
+    {
+        std::cout << item << " ";
+    }
+    return 0;
+    // 1 0 2 3 
+}
 
 }  // lambda expression
 
+namespace bind
+{
+// P354 参数绑定
 
+}
 namespace chapter8
 {
 // 可以这么认为:可以根据<< 或 >>箭头的方向来理解流的过程.
