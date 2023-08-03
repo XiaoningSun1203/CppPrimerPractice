@@ -1,2 +1,2 @@
 # CppPrimerPractice
-some demo about book
+I will store some demos about book <<C++ Primer>> here.
