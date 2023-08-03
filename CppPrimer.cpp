@@ -262,18 +262,32 @@ int main()
     // 111
     return 0;
 }
-// failed======================================================================
+// 引用捕获有时是必要的。 P351不能拷贝ostream对象，因此捕获os的唯一方法就是捕获其引用。
 #include <iostream>
 #include <string>
 #include <algorithm>
-
+#include <fstream>
+#include <sstream>
 int main()
 {
     std::vector<std::string> words { "acbdfe", "10", "111" };
-    char blank{' '};
-    // P351不能拷贝ostream对象，因此捕获os的唯一方法就是捕获其引用。
-    std::ostream os;
-    for_each(words.begin(), words.end(), [&os](const std::string& s){ os << s << blank; });
+    std::ostream os(std::cout.rdbuf());  // shares buffer with cout
+    // rdbuf()可以实现一个流对象指向的内容用另一个流对象来输出,比如想把
+    // 一个文件的内容输出到显示器上,我们可以两行代码完成:
+    // ifstream infile("test.txt");
+    // cout << infile.rdbuf();
+    for_each(words.begin(), words.end(), [&os](const std::string& s){ os << s << " "; });
+
+    return 0;
+    // acbdfe 10 111 
+}
+// 如果用ostringstream重写上面的
+int main()
+{
+    std::vector<std::string> words {"abcdef", "10", "111"};
+    std::ostringstream oss;
+    for_each(words.begin(), words.end(), [&oss](const std::string& s){ oss << s << " "; });
+    std::cout << oss.str();
     return 0;
 }
 
@@ -282,9 +296,15 @@ int main()
 
 namespace chapter8
 {
-// #include <iostream>  // 可见域的操作
+// 可以这么认为:可以根据<< 或 >>箭头的方向来理解流的过程.
+// 比如:cout<<n; 由于<<箭头方向向左,所以意思就是将n的值流入cout。cout是标准输出流,所以cout<<n;就把n显示到了屏幕上.
+// 对于cin>>n;来说由于>>箭头方向向右,所以意思就是将cin中的数据流入n变量,cin是标准输入流,所以cin>>n;就把屏幕上的数据写入n变量.
+// 也就是说箭头的方向相当于流的方向,也就是数据的流向.对于其他流对象(xxxstream)也是一样的道理
+
+// #include <iostream>  // 可见域的操作, std::cin/std::cout 是对窗口的操作
 // #include <fstream>   // 对文件进行的操作
 // #include <sstream>   // 对内存的一种操作
+
 #include <iostream>
 #include <fstream>
 int main()
@@ -337,16 +357,13 @@ int main()
     // 入内存
     std::istringstream iss("from a stringstream");
     std::string container;
-    iss >> container;  // 把 “from” 放入字符串对象中
-    std::cout << container << std::endl;
-    iss >> container;  // 把 “a” 放入字符串对象中
-    std::cout << container << std::endl;
-    iss >> container;  // 把 “stringstream” 放入字符串对象中
-    std::cout << container << std::endl;
-    // 输出结果如下：
-    // from
-    // a
-    // stringstream
+
+    iss >> container;                     // 把 “from” 写入字符串对象中
+    std::cout << container << std::endl;  // from
+    iss >> container;                     // 把 “a” 写入字符串对象中
+    std::cout << container << std::endl;  // a
+    iss >> container;                     // 把 “stringstream” 写入字符串对象中
+    std::cout << container << std::endl;  // stringstream
 
     return 0;
 }
@@ -388,11 +405,11 @@ int main()
     string record2 {"anNi 010343 010215"};
 
     // 把两条记录塞入一个输出流
-    ostringstream outputStream;
-    outputStream << record1 << std::endl;
-    outputStream << record2 << std::endl;
+    ostringstream oss;
+    oss << record1 << std::endl;
+    oss << record2 << std::endl;
     
-    string line, word;  // line 中有一行， word 中是两个空格间的一个词
+    string line, word;  // line 用来存储一行， word 用来存储两个空格间的一个词
     istringstream inputStream(record1);
 
     // getline 函数，从一个给定的 istream 读取一行数据，存入一个给定的 string 对象中。
