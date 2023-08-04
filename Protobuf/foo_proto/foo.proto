@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package sunxiaoning;
+
+message Foo {
+    optional string text = 1;
+    repeated uint32 numbers = 2;
+}
+  
