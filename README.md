@@ -6,6 +6,7 @@
 - [Algorithms](Algorithms/README.md)：7 个源文件，BFS/DFS 保持同一文件
 - [OtherExperiments](OtherExperiments/README.md)：3 个源文件
 - [Protobuf](Protobuf/)：保留原结构
+- [YouTuber Cherno C++ 练习](youtuberCherno_Practice/README.md)：函数指针、Lambda、左值/右值、移动语义等
 
 ## C++ Primer 章节索引
 
